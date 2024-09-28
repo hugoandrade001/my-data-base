@@ -19,7 +19,7 @@ from person.person
 where lastName ='Adams' and FirstName like 'j%'
 order by LastName, FirstName
 
--Display the orders generated on the dates 01/01/2013-02/01/2013, based on the Order heading table. Rate each day's orders from the order with the highest SubTotal amount (rating 1) to the lowest. If there are orders with identical amounts, they receive the same rating, 
+-Display the orders generated on the dates 01/01/2013-02/01/2013, based on the Order heading table. Rate each days orders from the order with the highest SubTotal amount (rating 1) to the lowest. If there are orders with identical amounts, they receive the same rating, 
 and then the rating continues from the next number.
 
 select	LastName, 
@@ -91,3 +91,37 @@ join (
 ) dc
 
 on dc.JobTitle = e.JobTitle
+
+- Continuing from the previous question, examine the results. What is the range of differences? That is, what is the lowest difference and what is the highest difference?
+To answer this question, simply sort the results of the previous query according to the value in the Diff column.
+
+select 	h.SalesOrderID, h.SubTotal, d.LinesSum,
+		h.SubTotal - d.LinesSum as Diff
+from Sales.SalesOrderHeader h
+left join (	select	SalesOrderID, 
+	SUM (LineTotal) as LinesSum
+	from sales.SalesOrderDetail
+	group by SalesOrderID 
+) d
+on d.SalesOrderID = h.SalesOrderID
+where h.SubTotal - d.LinesSum <> 0
+order by h.SubTotal - d.LinesSum
+
+-Continuing from the previous question, examine the results of the previous query. Note that there are many order 
+lines that do not have any differences, which is great. Add an instruction to the query to display only the lines 
+with a difference (Diff). A preview of the results:
+
+select 	h.SalesOrderID, 
+		h.SubTotal, 
+		d.LinesSum,
+		h.SubTotal - d.LinesSum as Diff
+from Sales.SalesOrderHeader h
+left join (
+	select	SalesOrderID, 
+	SUM (LineTotal) as LinesSum
+	from sales.SalesOrderDetail
+	group by SalesOrderID 
+) d
+on d.SalesOrderID = h.SalesOrderID
+where h.SubTotal - d.LinesSum <> 0
+
